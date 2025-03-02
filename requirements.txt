@@ -1,4 +1,4 @@
-streamlit==1.42.2
-SpeechRecognition==3.14.1
-deep-translator
-PyAudio==0.2.13
+streamlit==1.30.0
+SpeechRecognition==3.10.0
+deep-translator==1.11.4
+pyaudio==0.2.13
