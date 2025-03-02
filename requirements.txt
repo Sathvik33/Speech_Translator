@@ -4,3 +4,4 @@ sounddevice==0.4.6
 speechrecognition==3.10.0
 deep-translator==1.11.4
 pydub==0.25.1
+pyaudio==0.2.13
