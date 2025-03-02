@@ -1,9 +1,14 @@
 import streamlit as st
+import sounddevice as sd
+import numpy as np
+import wave
+import os
+import tempfile
 import speech_recognition as sr
 from deep_translator import GoogleTranslator
 
 st.title("Speech Recognition and Translation App")
-
+st.write("Only for INDIANS")
 recognizer = sr.Recognizer()
 
 if "recognized_text" not in st.session_state:
@@ -11,7 +16,6 @@ if "recognized_text" not in st.session_state:
 if "translated_text" not in st.session_state:
     st.session_state.translated_text = ""
 
-# List of Indian languages with codes and full names
 languages = {
     "en": "English",
     "hi": "Hindi",
@@ -38,14 +42,27 @@ languages = {
 }
 
 language_code = st.selectbox("Select Language Code", list(languages.keys()))
-
 st.write(f"Selected Language: **{languages[language_code]}**")
 
+def record_audio(duration=5, samplerate=44100):
+    st.write("Recording...")
+    audio_data = sd.rec(int(duration * samplerate), samplerate=samplerate, channels=1, dtype=np.int16)
+    sd.wait()
+    
+    temp_wav = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
+    with wave.open(temp_wav.name, "wb") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(samplerate)
+        wf.writeframes(audio_data.tobytes())
+
+    return temp_wav.name
+
 if st.button("Start Recording"):
-    with sr.Microphone() as source:
-        st.write("Say something...")
-        recognizer.adjust_for_ambient_noise(source)
-        audio = recognizer.listen(source)
+    audio_path = record_audio()
+
+    with sr.AudioFile(audio_path) as source:
+        audio = recognizer.record(source)
 
     try:
         text = recognizer.recognize_google(audio, language=language_code)
@@ -59,6 +76,8 @@ if st.button("Start Recording"):
         st.error("Sorry, I could not understand that message.")
     except sr.RequestError:
         st.error("Could not request results; check your network connection.")
+
+    os.remove(audio_path)
 
 if st.button("Clear"):
     st.session_state.recognized_text = ""
