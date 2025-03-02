@@ -1,3 +1,4 @@
+streamlit==1.25.0
 numpy==1.26.4
 sounddevice==0.4.6
 speechrecognition==3.10.0
