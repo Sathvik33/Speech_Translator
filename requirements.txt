@@ -1,4 +1,6 @@
 streamlit==1.30.0
-SpeechRecognition==3.10.0
+speechrecognition==3.10.0
 deep-translator==1.11.4
 sounddevice==0.4.6
+numpy==1.26.4
+soundfile==0.12.1
