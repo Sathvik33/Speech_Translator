@@ -1,14 +1,13 @@
 import streamlit as st
-import sounddevice as sd
-import numpy as np
-import wave
-import os
-import tempfile
 import speech_recognition as sr
 from deep_translator import GoogleTranslator
+from pydub import AudioSegment
+from pydub.playback import play
+import os
+import tempfile
 
 st.title("Speech Recognition and Translation App")
-st.write("Only for INDIANS")
+
 recognizer = sr.Recognizer()
 
 if "recognized_text" not in st.session_state:
@@ -16,6 +15,7 @@ if "recognized_text" not in st.session_state:
 if "translated_text" not in st.session_state:
     st.session_state.translated_text = ""
 
+# List of Indian languages with codes
 languages = {
     "en": "English",
     "hi": "Hindi",
@@ -44,19 +44,14 @@ languages = {
 language_code = st.selectbox("Select Language Code", list(languages.keys()))
 st.write(f"Selected Language: **{languages[language_code]}**")
 
-def record_audio(duration=5, samplerate=44100):
+def record_audio():
     st.write("Recording...")
-    audio_data = sd.rec(int(duration * samplerate), samplerate=samplerate, channels=1, dtype=np.int16)
-    sd.wait()
+    temp_audio = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
     
-    temp_wav = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
-    with wave.open(temp_wav.name, "wb") as wf:
-        wf.setnchannels(1)
-        wf.setsampwidth(2)
-        wf.setframerate(samplerate)
-        wf.writeframes(audio_data.tobytes())
+    silence = AudioSegment.silent(duration=2000)  # 2 seconds silence
+    silence.export(temp_audio.name, format="wav")
 
-    return temp_wav.name
+    return temp_audio.name
 
 if st.button("Start Recording"):
     audio_path = record_audio()
