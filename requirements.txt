@@ -1,7 +1,8 @@
-streamlit==1.25.0
-numpy==1.26.4
-sounddevice==0.4.6
-speechrecognition==3.10.0
-deep-translator==1.11.4
-pydub==0.25.1
-soundfile==0.12.1
+streamlit
+sounddevice
+numpy
+SpeechRecognition
+deep-translator
+pydub
+wave
+ffmpeg-python
