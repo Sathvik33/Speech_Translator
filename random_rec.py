@@ -8,7 +8,7 @@ import os
 import tempfile
 import wave
 
-os.environ["PATH"] += os.pathsep + "/path/to/ffmpeg/bin"  # Update with your actual FFmpeg path
+os.environ["PATH"] += os.pathsep + "/path/to/ffmpeg/bin"
 
 st.title("Live Speech Recognition & Translation App")
 
@@ -44,21 +44,23 @@ languages = {
     "sat": "Santali"
 }
 
-language_code = st.selectbox("Select Language Code", list(languages.keys()))
-st.write(f"Selected Language: **{languages[language_code]}**")
+source_language = st.selectbox("Select Source Language", list(languages.keys()), format_func=lambda x: languages[x])
+target_language = st.selectbox("Select Target Language", list(languages.keys()), format_func=lambda x: languages[x])
 
-# Function to record audio
+st.write(f"Selected Source Language: **{languages[source_language]}**")
+st.write(f"Selected Target Language: **{languages[target_language]}**")
+
 def record_audio(duration=5, samplerate=44100):
     st.write("Recording... Speak now!")
     audio_data = sd.rec(int(duration * samplerate), samplerate=samplerate, channels=1, dtype=np.int16)
-    sd.wait()  # Wait until recording is finished
+    sd.wait()
     return audio_data, samplerate
 
 def save_audio(audio_data, samplerate):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmpfile:
         with wave.open(tmpfile.name, 'w') as wf:
             wf.setnchannels(1)
-            wf.setsampwidth(2)  # 16-bit audio
+            wf.setsampwidth(2)
             wf.setframerate(samplerate)
             wf.writeframes(audio_data.tobytes())
         return tmpfile.name
@@ -73,15 +75,15 @@ if st.button("Start Recording"):
 
         with sr.AudioFile(audio_file) as source:
             audio = recognizer.record(source)
-        
-        text = recognizer.recognize_google(audio, language=language_code)
+
+        text = recognizer.recognize_google(audio, language=source_language)
         st.session_state.recognized_text = text
         st.success("You said: " + text)
 
-        translated = GoogleTranslator(source="auto", target="en").translate(text)
+        translated = GoogleTranslator(source=source_language, target=target_language).translate(text)
         st.session_state.translated_text = translated
-        st.success("Translated to English: " + translated)
-
+        st.success(f"Translated to {languages[target_language]}: " + translated)
+    
     except sr.UnknownValueError:
         st.error("Sorry, I could not understand that message.")
     except sr.RequestError:
